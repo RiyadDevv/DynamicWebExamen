@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BrusselsExplorer - Sportlocaties</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <h1> Openbare sportlocaties in Brussel</h1>
+
+  <!-- Filters bovenaan -->
+  <div class="filters">
+    <label for="filterPostal">Filter op postcode:</label>
+    <select id="filterPostal">
+      <option value="all">Alle postcodes</option>
+    </select>
+
+    <label for="filterActivity">Filter op activiteit:</label>
+    <select id="filterActivity">
+      <option value="all">Alle activiteiten</option>
+    </select>
+
+    <label for="search"> Zoek:</label>
+    <input type="text" id="search" placeholder="Naam of adres...">
+
+    <label for="sortOrder">Sorteer op:</label>
+    <select id="sortOrder">
+      <option value="">Selecteer</option>
+      <option value="name">Naam (A-Z)</option>
+      <option value="nameDesc">Naam (Z-A)</option>
+    </select>
+  </div>
+
+  <h2> Je favorieten</h2>
+  <div id="favorites"></div>
+
+  <div id="results"></div>
+
+  <!-- Kleine observer onderaan -->
+  <div id="bottomObserver" style="height: 10px;"></div>
+
+  <script src="script.js"></script>
+</body>
+</html>

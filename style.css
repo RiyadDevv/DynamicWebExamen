@@ -1,0 +1,79 @@
+body {
+    font-family: Arial, sans-serif;
+    padding: 1rem;
+    background: #f9f9f9;
+  }
+  
+  h1, h2 {
+    text-align: center;
+    margin-bottom: 1rem;
+  }
+  
+  .filters {
+    max-width: 800px;
+    margin: 0 auto 2rem auto;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    justify-content: center;
+  }
+  
+  label {
+    font-weight: bold;
+  }
+  
+  select,
+  input[type="text"] {
+    padding: 0.5rem;
+    font-size: 1rem;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+  }
+  
+  #results, #favorites {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    justify-content: center;
+    margin-bottom: 2rem;
+  }
+  
+  .card {
+    background: white;
+    border-radius: 8px;
+    padding: 1rem;
+    width: 300px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  }
+  
+  .card h3 {
+    margin-top: 0;
+  }
+  
+  .card a {
+    color: #007bff;
+    text-decoration: none;
+  }
+  
+  .favorite-btn {
+    margin-top: 0.5rem;
+    display: inline-block;
+    background: #ffd1dc;
+    color: #333;
+    border: none;
+    padding: 0.4rem 0.8rem;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .favorite-btn:hover {
+    background-color: #ffadc0;
+  }
+  
+  #bottomMessage {
+    text-align: center;
+    font-size: 1rem;
+    padding: 1rem;
+    color: #007bff;
+  }
+  
