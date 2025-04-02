@@ -9,37 +9,52 @@
 <body>
   <h1> Openbare sportlocaties in Brussel</h1>
 
-  <!-- Filters bovenaan -->
+  <!-- filters: postcode, activiteit, zoekveld, sortering, dark mode -->
   <div class="filters">
-    <label for="filterPostal">Filter op postcode:</label>
-    <select id="filterPostal">
-      <option value="all">Alle postcodes</option>
-    </select>
+    <div class="filter-row">
+      <!-- Filter op postcode -->
+      <label for="filterPostal">Postcode:</label>
+      <select id="filterPostal">
+        <option value="all">Alle postcodes</option>
+      </select>
 
-    <label for="filterActivity">Filter op activiteit:</label>
-    <select id="filterActivity">
-      <option value="all">Alle activiteiten</option>
-    </select>
+      <!-- filter op activiteit -->
+      <label for="filterActivity">Activiteit:</label>
+      <select id="filterActivity">
+        <option value="all">Alle activiteiten</option>
+      </select>
+    </div>
 
-    <label for="search"> Zoek:</label>
-    <input type="text" id="search" placeholder="Naam of adres...">
+    <div class="filter-row">
+      <!-- zoekveld op naam of adres -->
+      <label for="search">Zoek:</label>
+      <input type="text" id="search" placeholder="Naam of adres...">
 
-    <label for="sortOrder">Sorteer op:</label>
-    <select id="sortOrder">
-      <option value="">Selecteer</option>
-      <option value="name">Naam (A-Z)</option>
-      <option value="nameDesc">Naam (Z-A)</option>
-    </select>
-  </div>
+      <!-- sorteeroptie -->
+      <label for="sortOrder">Sorteer op:</label>
+      <select id="sortOrder">
+        <option value="">Selecteer</option>
+        <option value="name">Naam (A-Z)</option>
+        <option value="nameDesc">Naam (Z-A)</option>
+      </select>
 
+      <!-- donker thema toggle -->
+      <label for="themeSwitch">🌙 Donker thema</label>
+      <input type="checkbox" id="themeSwitch">
+    </div>
+  </div>  
+
+  <!-- fav worden hier weergegeven -->
   <h2> Je favorieten</h2>
   <div id="favorites"></div>
 
+  <!-- alle sportlocaties komen hier in kaartenvorm -->
   <div id="results"></div>
 
-  <!-- Kleine observer onderaan -->
+  <!-- klein onzichtbaar blokje om te detecteren of gebruiker onderaan is -->
   <div id="bottomObserver" style="height: 10px;"></div>
 
+  <!-- js wordt aan het einde geladen -->
   <script src="script.js"></script>
 </body>
 </html>

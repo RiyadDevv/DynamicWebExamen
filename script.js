@@ -3,64 +3,63 @@ let allLocations = [];
 
 document.addEventListener('DOMContentLoaded', () => {
   fetchData();
+  setupTheme();
   setupObserver();
 });
 
-// data ophalen van de API
+// data ophalen via API
 async function fetchData() {
   try {
-    const response = await fetch(apiURL);
-    const data = await response.json();
+    const res = await fetch(apiURL);
+    const data = await res.json();
     allLocations = data.results;
-
     populateFilters(allLocations);
     renderLocations(allLocations);
-  } catch (error) {
-    console.error('Fout bij het ophalen van data:', error);
+    renderFavorites();
+  } catch (e) {
+    console.error("API-fout:", e);
   }
 }
 
-// filters invullen op basis van unieke waarden in de data
+// unieke waarden in de filters
 function populateFilters(locations) {
   const filterPostal = document.getElementById('filterPostal');
   const filterActivity = document.getElementById('filterActivity');
 
-  const uniquePostcodes = [...new Set(locations.map(loc => loc.postalcode))].sort();
-  const uniqueActivities = [...new Set(locations.map(loc => loc.activities_nl))].sort();
+  const postcodes = [...new Set(locations.map(l => l.postalcode))].sort();
+  const activiteiten = [...new Set(locations.map(l => l.activities_nl))].sort();
 
-  uniquePostcodes.forEach(postcode => {
+  postcodes.forEach(p => {
     const opt = document.createElement('option');
-    opt.value = postcode;
-    opt.textContent = postcode;
+    opt.value = p;
+    opt.textContent = p;
     filterPostal.appendChild(opt);
   });
 
-  uniqueActivities.forEach(activity => {
+  activiteiten.forEach(a => {
     const opt = document.createElement('option');
-    opt.value = activity;
-    opt.textContent = activity;
+    opt.value = a;
+    opt.textContent = a;
     filterActivity.appendChild(opt);
   });
 
-  filterPostal.addEventListener('change', filterData);
-  filterActivity.addEventListener('change', filterData);
-  document.getElementById('search').addEventListener('input', filterData);
-  document.getElementById('sortOrder').addEventListener('change', filterData);
+  // filters activeren
+  filterPostal.addEventListener('change', applyFilters);
+  filterActivity.addEventListener('change', applyFilters);
+  document.getElementById('search').addEventListener('input', applyFilters);
+  document.getElementById('sortOrder').addEventListener('change', applyFilters);
 }
 
-// locaties tonen op de pagina
+// toon locaties in cards
 function renderLocations(locations) {
   const container = document.getElementById('results');
   container.innerHTML = '';
-
-  if (locations.length === 0) {
-    container.innerHTML = '<p>Geen resultaten gevonden.</p>';
-    return;
-  }
+  const favorites = getFavorites();
 
   locations.forEach(loc => {
     const card = document.createElement('div');
     card.className = 'card';
+    const id = `${loc.name_nl}__${loc.activities_nl}`;
 
     card.innerHTML = `
       <h3>${loc.name_nl}</h3>
@@ -71,34 +70,82 @@ function renderLocations(locations) {
       <a href="${loc.google_maps}" target="_blank">📍 Bekijk op Google Maps</a>
     `;
 
+    // favorietenknop toevoegen
+    const favBtn = document.createElement('button');
+    favBtn.className = 'favorite-btn';
+    favBtn.textContent = favorites.includes(id) ? '❌ Verwijderen' : '❤️ Favoriet';
+    favBtn.addEventListener('click', () => {
+      toggleFavorite(id);
+      renderFavorites();
+      applyFilters();
+    });
+
+    card.appendChild(favBtn);
     container.appendChild(card);
   });
 }
 
-// filtering toepassen
-function filterData() {
+// filterdata op basis van invoer
+function applyFilters() {
   const postal = document.getElementById('filterPostal').value;
   const activity = document.getElementById('filterActivity').value;
-  const search = document.getElementById('search').value.trim().toLowerCase();
+  const search = document.getElementById('search').value.toLowerCase();
   const sort = document.getElementById('sortOrder').value;
 
   let filtered = allLocations.filter(loc => {
-    const matchPostcode = postal === 'all' || loc.postalcode === postal;
-    const matchActivity = activity === 'all' || loc.activities_nl === activity;
+    const matchPostal = postal === 'all' || loc.postalcode === postal;
+    const matchAct = activity === 'all' || loc.activities_nl === activity;
     const matchSearch = loc.name_nl.toLowerCase().includes(search) || (loc.address_nl ?? '').toLowerCase().includes(search);
-    return matchPostcode && matchActivity && matchSearch;
+    return matchPostal && matchAct && matchSearch;
   });
 
-  if (sort === 'name') {
-    filtered.sort((a, b) => a.name_nl.localeCompare(b.name_nl));
-  } else if (sort === 'nameDesc') {
-    filtered.sort((a, b) => b.name_nl.localeCompare(a.name_nl));
-  }
+  if (sort === 'name') filtered.sort((a, b) => a.name_nl.localeCompare(b.name_nl));
+  if (sort === 'nameDesc') filtered.sort((a, b) => b.name_nl.localeCompare(a.name_nl));
 
   renderLocations(filtered);
 }
 
-// bericht tonen als gebruiker onderaan komt
+// favorietenlogica (localStorage)
+function getFavorites() {
+  return JSON.parse(localStorage.getItem('favorites') || '[]');
+}
+
+function saveFavorites(favs) {
+  localStorage.setItem('favorites', JSON.stringify(favs));
+}
+
+function toggleFavorite(id) {
+  let favs = getFavorites();
+  if (favs.includes(id)) {
+    favs = favs.filter(f => f !== id);
+  } else {
+    favs.push(id);
+  }
+  saveFavorites(favs);
+}
+
+// favorieten opnieuw tonen
+function renderFavorites() {
+  const favDiv = document.getElementById('favorites');
+  favDiv.innerHTML = '';
+  const favs = getFavorites();
+  const data = allLocations.filter(loc => favs.includes(`${loc.name_nl}__${loc.activities_nl}`));
+
+  data.forEach(loc => {
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.innerHTML = `
+      <h3>${loc.name_nl}</h3>
+      <p><strong>Activiteit:</strong> ${loc.activities_nl}</p>
+      <p><strong>Adres:</strong> ${loc.address_nl ?? 'Onbekend'}</p>
+      <p><strong>Postcode:</strong> ${loc.postalcode}</p>
+      <p><strong>Gemeente:</strong> ${loc.municipality_nl ?? 'Onbekend'}</p>
+    `;
+    favDiv.appendChild(card);
+  });
+}
+
+// melding tonen onderaan de pagina (Observer API)
 function setupObserver() {
   const observer = new IntersectionObserver(entries => {
     entries.forEach(entry => {
@@ -111,6 +158,19 @@ function setupObserver() {
       }
     });
   });
-
   observer.observe(document.getElementById('bottomObserver'));
+}
+
+// donker/licht thema instellen + bewaren
+function setupTheme() {
+  const checkbox = document.getElementById('themeSwitch');
+  const theme = localStorage.getItem('theme');
+  if (theme === 'dark') {
+    document.body.classList.add('dark');
+    checkbox.checked = true;
+  }
+  checkbox.addEventListener('change', () => {
+    document.body.classList.toggle('dark');
+    localStorage.setItem('theme', document.body.classList.contains('dark') ? 'dark' : 'light');
+  });
 }
