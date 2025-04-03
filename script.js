@@ -5,6 +5,7 @@ document.addEventListener('DOMContentLoaded', () => {
   fetchData();
   setupTheme();
   setupObserver();
+  setupSearchValidation(); // ✅ validatie toegevoegd
 });
 
 // data ophalen via API
@@ -16,6 +17,7 @@ async function fetchData() {
     populateFilters(allLocations);
     renderLocations(allLocations);
     renderFavorites();
+    initMap(allLocations); // kaart genereren na data ophalen
   } catch (e) {
     console.error("API-fout:", e);
   }
@@ -95,7 +97,7 @@ function applyFilters() {
   let filtered = allLocations.filter(loc => {
     const matchPostal = postal === 'all' || loc.postalcode === postal;
     const matchAct = activity === 'all' || loc.activities_nl === activity;
-    const matchSearch = loc.name_nl.toLowerCase().includes(search) || (loc.address_nl ?? '').toLowerCase().includes(search);
+    const matchSearch = search.length < 2 || loc.name_nl.toLowerCase().includes(search) || (loc.address_nl ?? '').toLowerCase().includes(search);
     return matchPostal && matchAct && matchSearch;
   });
 
@@ -103,6 +105,20 @@ function applyFilters() {
   if (sort === 'nameDesc') filtered.sort((a, b) => b.name_nl.localeCompare(a.name_nl));
 
   renderLocations(filtered);
+}
+
+// zoekveld validatie
+function setupSearchValidation() {
+  const searchInput = document.getElementById('search');
+  searchInput.addEventListener('input', e => {
+    const value = e.target.value;
+    if (value.length > 0 && value.length < 2) {
+      e.target.setCustomValidity("Typ minstens 2 tekens");
+      e.target.reportValidity();
+    } else {
+      e.target.setCustomValidity("");
+    }
+  });
 }
 
 // favorietenlogica (localStorage)
@@ -172,5 +188,25 @@ function setupTheme() {
   checkbox.addEventListener('change', () => {
     document.body.classList.toggle('dark');
     localStorage.setItem('theme', document.body.classList.contains('dark') ? 'dark' : 'light');
+  });
+}
+
+// leaflet kaart tonen met markers (gebaseerd op loc.geo_point_2d)
+function initMap(locations) {
+  const map = L.map('map').setView([50.8503, 4.3517], 12); // centrum Brussel
+
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; OpenStreetMap-bijdragers'
+  }).addTo(map);
+
+  const markerGroup = [];
+
+  locations.forEach(loc => {
+    if (loc.geo_point_2d) {
+      const { lat, lon } = loc.geo_point_2d;
+      const marker = L.marker([lat, lon]).addTo(map);
+      marker.bindPopup(`<strong>${loc.name_nl}</strong><br>${loc.activities_nl}`);
+      markerGroup.push([lat, lon]);
+    }
   });
 }

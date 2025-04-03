@@ -117,3 +117,14 @@ body.dark .card {
     width: 90%;
   }
 }
+
+#map {
+  height: 400px;
+  margin-bottom: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+body.dark #map {
+  filter: grayscale(0.5) brightness(0.7);
+}
