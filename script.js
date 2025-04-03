@@ -5,7 +5,7 @@ document.addEventListener('DOMContentLoaded', () => {
   fetchData();
   setupTheme();
   setupObserver();
-  setupSearchValidation(); // ✅ validatie toegevoegd
+  setupSearchValidation();
 });
 
 // data ophalen via API
@@ -143,13 +143,17 @@ function toggleFavorite(id) {
 // favorieten opnieuw tonen
 function renderFavorites() {
   const favDiv = document.getElementById('favorites');
+  const favTitle = document.getElementById('favTitle');
   favDiv.innerHTML = '';
   const favs = getFavorites();
   const data = allLocations.filter(loc => favs.includes(`${loc.name_nl}__${loc.activities_nl}`));
 
+  // titel alleen tonen als er favorieten zijn
+  favTitle.style.display = data.length > 0 ? 'block' : 'none';
+
   data.forEach(loc => {
     const card = document.createElement('div');
-    card.className = 'card';
+    card.className = 'card favorite-card';
     card.innerHTML = `
       <h3>${loc.name_nl}</h3>
       <p><strong>Activiteit:</strong> ${loc.activities_nl}</p>
@@ -160,6 +164,7 @@ function renderFavorites() {
     favDiv.appendChild(card);
   });
 }
+
 
 // melding tonen onderaan de pagina (Observer API)
 function setupObserver() {

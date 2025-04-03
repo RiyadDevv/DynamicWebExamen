@@ -128,3 +128,8 @@ body.dark .card {
 body.dark #map {
   filter: grayscale(0.5) brightness(0.7);
 }
+/* speciale stijl voor favorietenkaarten */
+.favorite-card {
+  border: 2px solid #ff4d6d;
+  background-color: #fff0f3;
+}
